@@ -1,3 +1,5 @@
+//When you are done understanding this code please go to index2.js file in this same directory to learn advanced concepts
+//used for authentication in a secure way like JWT(JSON web tokens)
 //In order for this code to work make sure there are four files with json extensions:- users, admins, courses, purchases
 //Make sure that these files consists a single array in each of them, which can store multiple objects
 const express = require('express');
@@ -36,7 +38,7 @@ function adminAuthentication(req,res,next)
     }
     else
     {
-      res.status(404).send("Authentication failed")
+      res.status(403).send("Authentication failed")
     }
   })
 }
@@ -63,7 +65,7 @@ function userAuthentication(req,res,next)
     }
     else
     {
-      res.status(404).send("Authentication failed")
+      res.status(403).send("Authentication failed")
     }
   })
 }
@@ -91,7 +93,7 @@ app.post('/admin/signup', (req, res) => {
       }
       if(flag == 1)
       {
-        res.status(404).send("Username already registered")
+        res.status(403).send("Username already registered")
       }
       else
       {
@@ -171,7 +173,7 @@ app.put('/admin/courses/:title',adminAuthentication, (req, res) => {
         }
         if(flag == -1)
         {
-          res.status(404).send("There is no course with title:- "+req.params.title)
+          res.status(403).send("There is no course with title:- "+req.params.title)
         }
         else
         {
@@ -234,7 +236,7 @@ app.post('/user/signup', (req, res) => {
       }
       if(flag == 1)
       {
-        res.status(404).send("Username already registered")
+        res.status(403).send("Username already registered")
       }
       else
       {
@@ -298,7 +300,7 @@ app.post('/user/courses/:title',userAuthentication,  (req, res) => {
       }
       if(flag == -1)
       {
-        res.status(404).send("there is no such course as "+p)
+        res.status(403).send("there is no such course as "+p)
       }
       else
       {
@@ -311,6 +313,12 @@ app.post('/user/courses/:title',userAuthentication,  (req, res) => {
           {
             let purchases = JSON.parse(data)
             let a = courses[flag]
+            let user = req.headers.username
+            a.user = user
+            /*
+            Here you might notice we are adding another key "user" with value of username of the person buying to the object a 
+            we are doing this to make sure that in purchase 
+            */
             purchases.push(a)
             fs.writeFile("purchases.json",JSON.stringify(purchases),"utf-8",(err,data) => {
               if(err)
@@ -339,7 +347,16 @@ app.get('/user/purchasedCourses',userAuthentication,  (req, res) => {
     }
     else
     {
-      let purchases = JSON.parse(data)
+      let user = req.headers.username
+      let purchases = []
+      let allpurchases = JSON.parse(data)
+      for(let i=0;i<allpurchases.length;i++)
+      {
+        if(allpurchases[i].user == user)
+        {
+          purchases.push(allpurchases[i])
+        }
+      }
       res.status(200).json(purchases)
     }
   })
@@ -348,3 +365,6 @@ app.get('/user/purchasedCourses',userAuthentication,  (req, res) => {
 app.listen(3000, () => {
   console.log('Server is listening on port 3000');
 });
+
+//now go to index2.js file to learn how implement jwt for this same application logic so that we can perform authentication
+//in a more secure way instead of just having username and password everytime in the header whenever we access a route.
