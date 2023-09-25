@@ -227,7 +227,7 @@ app.post('/admin/login',(req, res) => {
           if(flag == 1)
           {
             let token = generatetoken(a)
-            res.status(403).send({"Status": "Admin login successfull", "token": token})
+            res.status(200).send({"Status": "Admin login successfull", "token": token})
           }
           else
           {
@@ -389,7 +389,7 @@ app.post('/user/login',(req, res) => {
           if(flag == 1)
           {
             let token = generatetoken(a)
-            res.status(403).send({"Status": "User login successfull", "token": token})
+            res.status(200).send({"Status": "User login successfull", "token": token})
           }
           else
           {
