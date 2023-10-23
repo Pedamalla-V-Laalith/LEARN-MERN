@@ -11,6 +11,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 //install the above module by running a command npm install jsonwebtoken
 /*
 jwt also known as JSON web token is an open standard that defines a compact way for securely sharing 
@@ -28,6 +29,7 @@ they should get back a jwt that is valid for 1 hour. They should then send just 
 In order to do this we will use a logic of generating a token for the user or admin of one hour whenever they signup or login
 but remember since you can signup only once, when your current token expires you need to login again in order to generate a new token
 */
+app.use(cors())
 app.use(express.json())
 app.listen(3000, () => {
     console.log('Server is listening on port 3000');
@@ -161,6 +163,11 @@ to access the routes they want to access
 */
 
 // Admin routes
+app.get('/admin/me',adminAuthentication,(req,res)=>{
+  // logic to get the username of current user whose token is in the header
+  res.status(200).send(req.admin)
+})
+
 app.post('/admin/signup', (req, res) => {
     // logic to sign up admin
     fs.readFile("admins.json","utf-8", (err,data) => {
@@ -248,18 +255,34 @@ app.post('/admin/courses',adminAuthentication, (req, res) => {
       else
       {
         let courses = JSON.parse(data)
-        let a = req.body
-        courses.push(a)
-        fs.writeFile("courses.json",JSON.stringify(courses),"utf-8",(err,data) => {
-          if(err)
+        let contains = false
+        for(let i=0;i<courses.length;i++)
+        {
+          if(courses[i].title == req.body.title)
           {
-            res.status(500).send("An error from the backend")
+            contains = true
+            break
           }
-          else
-          {
-            res.status(200).send("Course added")
-          }
-        })
+        }
+        if(contains)
+        {
+          res.status(403).send("There is already a course with title:- " + req.body.title)
+        }
+        else
+        {
+          let a = req.body
+          courses.push(a)
+          fs.writeFile("courses.json",JSON.stringify(courses),"utf-8",(err,data) => {
+            if(err)
+            {
+              res.status(500).send("An error from the backend")
+            }
+            else
+            {
+              res.status(200).send("Course added")
+            }
+          })
+        }
       }
     })
   });
@@ -322,7 +345,43 @@ app.get('/admin/courses',adminAuthentication, (req, res) => {
   });
 
 
+app.get('/admin/courses/:title',adminAuthentication, (req, res) => {
+  // logic to get a particular course
+  fs.readFile("courses.json","utf-8",(err,data) => {
+    if(err)
+    {
+      res.status(500).send("an error from the backend")
+    }
+    else
+    {
+      let courses = JSON.parse(data)
+      let flag = -1
+      for(let i = 0; i<courses.length;i++)
+      {
+          if(courses[i].title == req.params.title)
+          {
+            flag = i
+          }
+      }
+      if(flag == -1)
+      {
+        res.status(403).send("There is no course with title:- "+req.params.title)
+      }
+      else
+      {
+        res.status(200).send(courses[flag])
+      }
+    }
+  })
+});
+
+
 // User routes
+app.get('/user/me',userAuthentication,(req,res)=>{
+  // logic to get the username of current user whose token is in the header
+  res.status(200).send(req.user)
+})
+
 app.post('/user/signup', (req, res) => {
     // logic to sign up user
     fs.readFile("users.json","utf-8", (err,data) => {

@@ -1,0 +1,16 @@
+You are required to run a command in your command prompt to get boiler plate sort of thing installed in your folder
+which allows you to do your desired project (it basically makes your life easier)
+the command is:- npm create vite@latest
+when you run this command it's going to ask you to continue or not just keep pressing yes
+it's going to ask you the filename of the project you wanna create, so give the filename too
+and then it's going to give you a bunch of options to choose from
+since we want to deal with react choose react
+and then it's going to ask you for the desired language
+choose javascript and then 
+and then it's going to ask you to run few commands run them and then you are good to go
+
+Now when you do all this you might a localHost link which will take you to a webpage
+the frontend webpage code is written in a file known as App.jsx in src folder
+And the contents of App.jsx are styled very nicely using the other files in src folder
+now you can modify these files and write your own code so that you will have your own webpage
+in order to learn more about how exactly everything happens, dive into the project and learn through exploration.

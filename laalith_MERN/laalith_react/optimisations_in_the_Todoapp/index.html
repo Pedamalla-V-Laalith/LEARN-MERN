@@ -1,0 +1,199 @@
+<!--
+    In laalith_nodejs_and_express folder we did a project known as connecting
+    to frontend in that project we did this same todo application
+    But now in this project let's take our reconciler(frontend) to the next level
+    and optimise the previous todo app as much as possible by learning along the way
+-->
+<head>
+
+</head>
+<script>
+
+    function getData()
+    {
+        function callback2(response_object)
+        {
+            response_object.json().then(parse_response)            
+        }
+        function parse_response(data)
+        {
+            console.log(data)
+            let reference_to_html_block = document.getElementById("dataArea")
+            reference_to_html_block.innerHTML = ""
+            for(let i=0; i<data.length;i++)
+            {
+                var childElement = document.createElement("div")
+                childElement.setAttribute("id", data[i].id)
+                childElement.innerHTML = "id:- "+data[i].id+"<br>"+"title:- "+data[i].title+"<br>"+"description:- "+data[i].description+"<br>"
+                var buttonElement = document.createElement("button")
+                buttonElement.setAttribute("onclick","upData("+data[i].id+")")
+                buttonElement.innerHTML = "Update"
+                childElement.appendChild(buttonElement)
+                var buttonElement = document.createElement("button")
+                buttonElement.setAttribute("onclick","dltData("+data[i].id+")")
+                buttonElement.innerHTML = "Delete"
+                childElement.appendChild(buttonElement)
+                childElement.innerHTML = childElement.innerHTML + "<br><br>"
+                reference_to_html_block.appendChild(childElement)
+            }
+
+        }
+        let obj = {
+            method: "GET",
+        }
+        fetch("http://localhost:3000/todos",obj).then(callback2)  
+    }
+    getData()
+
+
+    function dltData(n)
+    {
+        function callback3(response_object)
+        {
+            response_object.text().then(parse_response)
+        }
+        function parse_response(data)
+        {
+            document.getElementById("statusArea").innerHTML = data
+            //getData()
+            /*
+            Previously what we did is we inserted the whole in the DOM by calling getData() everytime we
+            make a change but now what we are going to do is change only that element which represents
+            the todo task which we modified or deleted or added
+            */
+            var deletedTodo = document.getElementById(n)
+            deletedTodo.remove();
+            /*
+            here basically what we are doing is we are removing a specific element with id n (how do we know that the id is n? check the getData() function then you will understand)
+            Here we are storing the reference of an element with id of value of n in deletedTodo and then using the function remove 
+            to remove only that specific element from the DOM.
+            */
+        }
+        let obj = {
+            method: "DELETE",
+        }
+        fetch("http://localhost:3000/todos/"+n,obj).then(callback3)
+    }
+    function upData(n)
+    {
+        let title = document.getElementById("updated_title").value
+        let description = document.getElementById("updated_description").value
+        let obj = {
+            method: "PUT",
+            headers : {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "title" : title,
+                "description" : description,
+            })
+        }
+        fetch("http://localhost:3000/todos/"+n,obj).then(callback4)
+        function callback4(response_object)
+        {
+            response_object.text().then(parse_response)
+        }
+        function parse_response(data)
+        {
+            document.getElementById("statusArea").innerHTML = data
+            //getData()
+            //here also we are doing the same thing of getting all the data now let's optimise this also.
+            //Basically now what we have to do is we have to remove only the data of the particular element
+            //and insert new data inplace of it.
+            var updatedElement = document.getElementById(n)
+            updatedElement.innerHTML = "id:- "+n+"<br>"+"title:- "+title+"<br>"+"description:- "+description+"<br>"
+            var buttonElement = document.createElement("button")
+            buttonElement.setAttribute("onclick","upData("+n+")")
+            buttonElement.innerHTML = "Update"
+            updatedElement.appendChild(buttonElement)
+            var buttonElement = document.createElement("button")
+            buttonElement.setAttribute("onclick","dltData("+n+")")
+            buttonElement.innerHTML = "Delete"
+            updatedElement.appendChild(buttonElement)
+            updatedElement.innerHTML = updatedElement.innerHTML + "<br><br>"
+        }
+    }
+    function postData() 
+    {
+        let title = document.getElementById("title").value
+        let description = document.getElementById("description").value
+        function parse_response(data)
+        {
+            document.getElementById("statusArea").innerHTML = data.message
+            //getData()
+            //here also we are doing the same thing of getting all the data now let's optimise this also.
+            //Basically now what we have to do is we have to append a element to the existing data in dataArea div
+            //But you might notice a problem in this. If you check the previous version of this code
+            //you would know there is no easy way for us to know the id of newly added element
+            //we could get the id of the last element in the DOM and add plus 1 to it and view that as the id of the newly added Todo
+            //Because if there is some activity in the backend where we manually deleted the last item before the user added new item
+            //then there might be a bug which will show us wrong id of the new Todo
+            //in order to solve this we will change backend codes just a little bit so that along with the status text we will get the id
+            //of the newly added element/Todo
+            //After the changes we made the response object now gives us a json which has keys :- message, id
+            //now since we got the id let's work with it
+            var n = data.id
+            let reference_to_html_block = document.getElementById("dataArea")
+            var newElement = document.createElement("div")
+            newElement.setAttribute("id", n)
+            newElement.innerHTML = "id:- "+n+"<br>"+"title:- "+title+"<br>"+"description:- "+description+"<br>"
+            var buttonElement = document.createElement("button")
+            buttonElement.setAttribute("onclick","upData("+n+")")
+            buttonElement.innerHTML = "Update"
+            newElement.appendChild(buttonElement)
+            var buttonElement = document.createElement("button")
+            buttonElement.setAttribute("onclick","dltData("+n+")")
+            buttonElement.innerHTML = "Delete"
+            newElement.appendChild(buttonElement)
+            newElement.innerHTML = newElement.innerHTML + "<br><br>"
+            reference_to_html_block.appendChild(newElement)
+        }
+        function callback(response_object)
+        {
+            response_object.json().then(parse_response)
+        }
+        let obj = {
+            method: "POST",
+            headers : {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "title" : title,
+                "description" : description,
+            })
+        }
+        fetch("http://localhost:3000/todos",obj).then(callback)
+    }
+</script>
+<body>
+    <h1>TODO APP</h1>
+    <b>Create a new todo:-</b>
+    <br>
+    <p>Todo title</p>
+    <input type = "text" id = "title">
+    <br>
+    <p>Todo description</p>
+    <input type = "text" id = "description">
+    <br>
+    <button onclick="postData()">post todo</button>
+    <br><br><br>
+    <b>For updating a todo task enter the data</b>
+    <br>
+    <b>and click update on the respective button in todo list:-</b>
+    <p>Todo title</p>
+    <input type = "text" id = "updated_title">
+    <br>
+    <p>Todo description</p>
+    <input type = "text" id = "updated_description">
+    <br><br><br>
+    <b>Your status:- </b>
+    <br>
+    <div id="statusArea">
+    </div>
+    <br><br><br>
+    <b>Your todo list is:-</b>
+    <br>
+    <div id="dataArea">
+
+    </div>
+</body>
