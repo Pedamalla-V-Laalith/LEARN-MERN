@@ -1,0 +1,43 @@
+Till now we worked with http servers, which follows http protocol as the name suggests.
+now we will learn how to work with web sockets
+we will now make a server which follows web sockets protocol
+But you might think why are we doing this:-
+Let us understand with an example
+We all remeber the todo app which we did right. In that if i add a new todo to the todo list in another tab
+then our current tab's todo list won't be updated right. In order to make almost realtime updations we can do something like,
+sending request to get the data of the whole todo list every 5 seconds or 10 seconds. But this is not realtime updations.
+So in order to do that we will use web sockets
+web sockets use a concept known as SSE(which is server side events).
+So whenever the server notices a change is occured that needs to be updated at the client's side, the backend sever automatically sends
+the data to the client and the client side DOM will be updated as required.
+
+
+In web sockets one client will send data to the server and when server recieves data it automatically sends the data to all other
+clients without the clients requesting for that data.
+
+But in the case of webRTC we need clients to talk to one another/clients share data between one another without the involvment of server(like a peer to peer connection).
+You don't have to understand these concepts way too much for now if necessary then you can search and learn about it since it is 
+open source.
+
+Now, in our project what we are going to do is:-
+first we need to figure out how to know which client can talk to which client on the browser.
+In order for a browser to talk to another browser, the browser first gets to know it's own IP address and port number which is in use
+this can be known by the client-side server sending a STUN request. When each browser gets it's own ip address and port number.
+These two details of every browser is sent to all the the other browsers through the usage of web sockets.
+we will call this details as ice candidates since that's what the convention is.
+
+(Note:- STUN servers have one task to do whenever some browser sends it a request it responds with the clientside's IP and port)
+
+peer connection object:-
+we can create instances of this object. This object is what allows us to have peer to peer connection.
+this object has two specific keys which are very important; localDescription, remoteDescription.
+these two keys are very crucial to establish a connection. becoz localDescription stores the ice candidate of it's own particular
+clientside server and remoteDescription stores the ice candidate of the client with whom we need to establish a connection.
+
+
+to see the inspiration go to this link:- https://github.com/100xDevs-hkirat/gmeet-webrtc
+
+
+VERY IMPORTANT NOTE:-
+IN ORDER TO UNDERSTAND WEB SOCKETS PLEASE VISIT THIS chatGPT CONVERSATION
+https://chat.openai.com/share/c41ec59c-4431-402e-b0b5-0858c2f4c246
