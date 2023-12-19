@@ -107,7 +107,7 @@ function authenticateJwt (req, res, next){
   }
 
 //let's connect to the database now:-
-mongoose.connect('mongodb+srv://bharathiraj2258:QAFWHElsph4OoF6R@cluster0.uxhil6w.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true, dbName: "Primitive_courses_app" })
+mongoose.connect('mongodb+srv://<userid>:<password>@cluster0.uxhil6w.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true, dbName: "Primitive_courses_app" })
 //This above line let's us connect to the database which we want to work with
 //note:- If you are trying this out on your own then you have to have your own cluster in mongodb and the url and dbName should also be your own url and database name.
 //note:- In the url where there is <userid> insert your own userid and where there is <password> insert your own password (Don't worry you will get an idea about url when you make one cluster)
