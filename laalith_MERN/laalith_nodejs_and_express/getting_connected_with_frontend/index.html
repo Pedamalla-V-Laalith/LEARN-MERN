@@ -1,0 +1,229 @@
+<head>
+
+</head>
+<script>
+
+    function postData() 
+    {
+        let title = document.getElementById("title").value
+        let description = document.getElementById("description").value
+        /*
+        In the above code we are getting the data which is entered by the user in two
+        input tags of frontend with ids title and description and storing them in the 
+        variables title and description
+        */
+       /*
+       in the above code 
+       The document.getElementById() function in JavaScript 
+       returns a reference to the HTML element with the specified 
+       id attribute. It allows you to access and manipulate the properties 
+       and content of that particular HTML element on a web page.
+       */
+        function parse_response(data)
+        {
+            console.log(data)
+            //the above console.log function logs the data in the console of the browser
+            document.getElementById("statusArea").innerHTML = data
+            //you will learn about the above function later on...
+            getData()
+        }
+        function callback(response_object)
+        {
+            response_object.text().then(parse_response)
+        }
+        let obj = {
+            method: "POST",
+            headers : {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "title" : title,
+                "description" : description,
+            })
+            //here we are creating a json which consists of request method, body, and headers.
+        }
+        fetch("http://localhost:3000/todos",obj).then(callback)
+    }
+    //the above function is for posting the data now let us write a function to get the data
+    function getData()
+    {
+        function callback2(response_object)
+        {
+            response_object.json().then(parse_response)            
+        }
+        function parse_response(data)
+        {
+            console.log(data)
+        //     let reference_to_html_block = document.getElementById("dataArea")
+        //     reference_to_html_block.innerHTML = JSON.stringify(data)
+        //     /*
+        //     now in the above code
+        //     The .innerHTML property of an HTML element represents the HTML content of that element,
+        //     including all of its child elements. It can be used to read or write the HTML content of an element.
+        //     */
+        //    /*
+        //    now the content of the element with id dataArea is JSON.stringify(data)
+        //    which is basically json format data represented as a string
+        //    */
+        /*
+        the above code will insert plaintext in the dataArea but that doesn't look good
+        now let us do something which actually looks good
+        that means instead of plaintext let us insert html elements in dataArea
+        */
+            let reference_to_html_block = document.getElementById("dataArea")
+            reference_to_html_block.innerHTML = ""
+            //this above block make sures that the content inside the element with id dataArea is emptied before appending data in it
+            for(let i=0; i<data.length;i++)
+            {
+                var childElement = document.createElement("div")
+                //the above createElement function creates a html element with tag mentioned in the argument of the function
+                childElement.innerHTML = "id:- "+data[i].id+"<br>"+"title:- "+data[i].title+"<br>"+"description:- "+data[i].description+"<br>"
+                var buttonElement = document.createElement("button")
+                buttonElement.setAttribute("onclick","upData("+data[i].id+")")
+                buttonElement.innerHTML = "Update"
+                childElement.appendChild(buttonElement)
+                var buttonElement = document.createElement("button")
+                buttonElement.setAttribute("onclick","dltData("+data[i].id+")")
+                //here in the above function we are creating a delete button by giving it an onclick attribute and it's value to be that of a delete function which takes
+                //argument of id of the button's corresponding todo item (in order to have specific callbacks for different buttons we just used concatenation action on mentioning the callback function)
+                buttonElement.innerHTML = "Delete"
+                childElement.appendChild(buttonElement)
+                childElement.innerHTML = childElement.innerHTML + "<br><br>"
+                reference_to_html_block.appendChild(childElement)
+                //the above line will insert childElement which is a div as a child element which is inside the element which has the id as dataArea
+            }
+
+        }
+        let obj = {
+            method: "GET",
+        }
+        fetch("http://localhost:3000/todos",obj).then(callback2)  
+    }
+    //now we can use the above function in a button so that the above function will be called when the button is clicked
+    //but let's do something different now let's write code in such a way that the above function is called when the webpage is
+    //opened or reloaded (i.e. when this html file is reloaded)
+    //in order to do that we can just simply call the getData() function in the script tag itself which results in, getData() being
+    //called when the file is opened.
+    getData()
+
+
+    //now let's write a function for delete buttons
+    //and in-order to that we need to know which button is calling this delete function
+    //and the best way to do this is to access the id of the todo task's delete button which is called
+    //we can do this by giving each and every delete button a specific onclick attribute which will perform the delete operation on the corresponding todo task
+    //and the delete function should take an argument of an appropriate id
+    function dltData(n)
+    {
+        function callback3(response_object)
+        {
+            response_object.text().then(parse_response)
+        }
+        function parse_response(data)
+        {
+            document.getElementById("statusArea").innerHTML = data
+            getData()
+            //we are using getData() here becuase after deletion we would want to get the new todo list in the element with id dataArea
+            //but we can do it in another way which will cause less work to be done instead of getting the whole data again we can write code
+            //in such a way that just like we are appending childElements in dataArea we can even remove certain elements but in order to do that we need have
+            //specific id for every childElement in dataArea such that it will be easier to remove
+            //but this does arises one complication which we are not handling right now
+            //the backend servers may sometimes fail to perform the delete operation in which case a text response is given in our code
+            //and if we are removing a certain childElement instead of using getData() it might show the users that data is deleted in dataArea but in reality
+            //it is not deleted. So for today we are going to use this getData() logic itself
+            /*
+            but if you are curious about how we can remove a child element from a html element
+            then this is how we do it:-
+            // Get a reference to the parent element
+            var parentElement = document.getElementById("parentElementId");
+            // Get a reference to the child element you want to remove
+            var childElement = document.getElementById("childElementId");
+            // Remove the child element from the parent element
+            parentElement.removeChild(childElement);
+            */
+        }
+        let obj = {
+            method: "DELETE",
+        }
+        fetch("http://localhost:3000/todos/"+n,obj).then(callback3)
+    }
+    function upData(n)
+    {
+        let title = document.getElementById("updated_title").value
+        let description = document.getElementById("updated_description").value
+        let obj = {
+            method: "PUT",
+            headers : {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "title" : title,
+                "description" : description,
+            })
+        }
+        fetch("http://localhost:3000/todos/"+n,obj).then(callback4)
+        function callback4(response_object)
+        {
+            response_object.text().then(parse_response)
+        }
+        function parse_response(data)
+        {
+            document.getElementById("statusArea").innerHTML = data
+            getData()
+        }
+    }
+</script>
+<!--
+    here in the above code we have a tag known as script which contains
+    code of javascript which only works on user's end, not in the backend
+    here you understand what is happening in the above script tag now let us
+    understand what is happening in the body
+-->
+<body>
+    <h1>TODO APP</h1>
+    <b>Create a new todo:-</b>
+    <br>
+    <p>Todo title</p>
+    <input type = "text" id = "title">
+    <br>
+    <p>Todo description</p>
+    <input type = "text" id = "description">
+    <br>
+    <button onclick="postData()">post todo</button>
+    <!--
+        here above in the button tag
+        onclick attribute specifies which function should be called 
+        when this particular button is clicked
+    -->
+    <!--
+        Now we have a html code above which takes input from the user and stores
+        it in a file in backend
+        now let us write a html code which displays the existing content of the previous
+        data.
+    -->
+    <br><br><br>
+    <b>For updating a todo task enter the data</b>
+    <br>
+    <b>and click update on the respective button in todo list:-</b>
+    <p>Todo title</p>
+    <input type = "text" id = "updated_title">
+    <br>
+    <p>Todo description</p>
+    <input type = "text" id = "updated_description">
+    <br><br><br>
+    <b>Your status:- </b>
+    <br>
+    <div id="statusArea">
+        <!--
+            the contents of the above div with id statusArea is written with the help of .innerHTML/appendChild() in the above functions so please check that out
+        -->
+    </div>
+    <br><br><br>
+    <b>Your todo list is:-</b>
+    <br>
+    <div id="dataArea">
+
+    </div>
+    <!--
+        the contents of the above div with id dataArea is written with the help of .innerHTML/appendChild() in the above functions so please check that out
+    -->
+</body>

@@ -1,0 +1,4 @@
+In this file we are going to be introduced to the concept of redux 
+
+the order to visit files and learn :-
+index.js --> index2.js --> index3.js --> index4.js

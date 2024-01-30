@@ -1,0 +1,3 @@
+here you can observer that the folder which we have inside server folder is nothing but the folder copied from laalith_mongodb folder.
+ we did this to explore some new concepts so explore this folder as well
+happy learning.

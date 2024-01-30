@@ -1,0 +1,8 @@
+to learn properly check out src folder. and all the contents
+of that folder
+
+And learn the components in this order:-
+App.jsx --> CakeContainer.jsx --> IcecreamContainer.jsx --> HooksCakeContainer.jsx
+
+if there are any other imports in these files which are not pre-defined libraries then 
+please check them out and learn them as well
